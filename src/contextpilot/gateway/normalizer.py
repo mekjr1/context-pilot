@@ -5,6 +5,14 @@ SENSITIVE_KEYWORDS = {"api_key", "authorization", "token", "secret", "password"}
 REDACTED_VALUE = "***REDACTED***"
 
 
+def _is_sensitive_key(key: Any) -> bool:
+    normalized_key = str(key).strip().lower().replace("-", "_").replace(".", "_")
+    if normalized_key in SENSITIVE_KEYWORDS:
+        return True
+    parts = {part for part in normalized_key.split("_") if part}
+    return bool(parts & SENSITIVE_KEYWORDS)
+
+
 def sanitize_for_trace(
     payload: Any,
     *,
@@ -20,7 +28,7 @@ def sanitize_for_trace(
             if index >= max_items:
                 output["__truncated__"] = True
                 break
-            if any(keyword in str(key).lower() for keyword in SENSITIVE_KEYWORDS):
+            if _is_sensitive_key(key):
                 output[key] = REDACTED_VALUE
             else:
                 output[key] = sanitize_for_trace(

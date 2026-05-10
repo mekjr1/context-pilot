@@ -24,7 +24,11 @@ def write_trace(route: str, payload: str) -> None:
 
 def write_trace_payload(route: str, payload: dict) -> None:
     sanitized = sanitize_for_trace(payload)
-    write_trace(route, json.dumps(sanitized))
+    try:
+        trace_payload = json.dumps(sanitized, default=str)
+    except (TypeError, ValueError):
+        trace_payload = json.dumps({"error": "trace_serialization_failed"})
+    write_trace(route, trace_payload)
 
 
 def write_route(task_type: str, model_tier: str) -> None:

@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -10,6 +11,9 @@ from contextpilot.api.models import router as m
 from contextpilot.api.openai import router as o
 from contextpilot.api.anthropic import router as a
 from contextpilot.storage.migrations import init_db
+
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -47,6 +51,7 @@ async def handle_http_error(_request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def handle_unexpected_error(_request, _exc: Exception):
+    logger.exception("Unhandled server error", exc_info=_exc)
     return JSONResponse(
         status_code=500,
         content=_error_payload("Internal server error", "internal_error", 500),
