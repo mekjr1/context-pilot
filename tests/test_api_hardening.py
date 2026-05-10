@@ -5,6 +5,8 @@ from fastapi.testclient import TestClient
 from contextpilot.main import app
 from contextpilot.storage.repositories import list_traces
 
+TRACE_SCAN_LIMIT = 200
+
 
 def test_auth_is_enforced_on_v1_routes():
     response = TestClient(app).get("/v1/models")
@@ -46,7 +48,7 @@ def test_trace_payload_redaction(auth_headers):
     )
     assert response.status_code == 200
 
-    traces = list_traces(limit=200)
+    traces = list_traces(limit=TRACE_SCAN_LIMIT)
     match = next((trace for trace in traces if marker in trace.payload), None)
     assert match is not None
     assert secret not in match.payload
