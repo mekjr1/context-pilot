@@ -1,0 +1,9 @@
+name: ContextPilot
+version: 0.0.1
+schema: v1
+models:
+  - name: ContextPilot Auto
+    provider: openai
+    model: contextpilot-auto
+    apiBase: http://localhost:8787/v1
+    apiKey: local-dev-key
