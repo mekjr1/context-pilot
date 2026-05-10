@@ -3,10 +3,6 @@ import uuid
 from fastapi.testclient import TestClient
 
 from contextpilot.main import app
-from contextpilot.storage.repositories import list_traces
-
-# Large enough to include the new test trace in a shared local test DB.
-TRACE_SCAN_LIMIT = 200
 
 
 def test_auth_is_enforced_on_v1_routes():
@@ -27,9 +23,17 @@ def test_validation_errors_are_standardized(auth_headers):
     assert payload["error"]["type"] == "invalid_request_error"
 
 
-def test_trace_payload_redaction(auth_headers):
+def test_trace_payload_redaction(auth_headers, monkeypatch):
     marker = f"safe-visible-marker-{uuid.uuid4()}"
     secret = "super-secret-value"
+    captured = {}
+
+    def fake_write_trace(_: str, payload: str):
+        captured["payload"] = payload
+
+    monkeypatch.setattr("contextpilot.api.openai.write_trace", fake_write_trace)
+    monkeypatch.setattr("contextpilot.api.openai.write_route", lambda *_: None)
+
     response = TestClient(app).post(
         "/v1/chat/completions",
         headers=auth_headers,
@@ -49,8 +53,6 @@ def test_trace_payload_redaction(auth_headers):
     )
     assert response.status_code == 200
 
-    traces = list_traces(limit=TRACE_SCAN_LIMIT)
-    match = next((trace for trace in traces if marker in trace.payload), None)
-    assert match is not None
-    assert secret not in match.payload
-    assert "[REDACTED]" in match.payload
+    assert marker in captured["payload"]
+    assert secret not in captured["payload"]
+    assert "[REDACTED]" in captured["payload"]
