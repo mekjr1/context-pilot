@@ -1,25 +1,28 @@
 import json
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 
+from contextpilot.api.auth import require_api_key
 from contextpilot.api.schemas import ChatCompletionRequest, ResponsesRequest
 from contextpilot.context.planner import plan
+from contextpilot.gateway.normalizer import redact_payload
 from contextpilot.router.classifier import classify
 from contextpilot.router.model_router import select_model
 from contextpilot.storage.repositories import write_route, write_trace
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix="/v1", dependencies=[Depends(require_api_key)])
 
 
 @router.post("/chat/completions")
 def chat(req: ChatCompletionRequest):
     payload = req.model_dump()
+    safe_payload = redact_payload(payload)
     messages = [m.model_dump() for m in req.messages]
     classification = classify(messages, req.model)
     route = select_model(classification)
     write_route(classification.task_type, route["tier"])
-    write_trace(classification.task_type, json.dumps(payload))
+    write_trace(classification.task_type, json.dumps(safe_payload))
 
     provider = route["provider"]
     model = route["model"]
