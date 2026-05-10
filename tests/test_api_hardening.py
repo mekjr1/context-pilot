@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi.testclient import TestClient
 
 from contextpilot.main import app
@@ -23,7 +25,7 @@ def test_validation_errors_are_standardized(auth_headers):
 
 
 def test_trace_payload_redaction(auth_headers):
-    marker = "safe-visible-marker"
+    marker = f"safe-visible-marker-{uuid.uuid4()}"
     secret = "super-secret-value"
     response = TestClient(app).post(
         "/v1/chat/completions",
@@ -44,7 +46,7 @@ def test_trace_payload_redaction(auth_headers):
     )
     assert response.status_code == 200
 
-    traces = list_traces(limit=50)
+    traces = list_traces(limit=200)
     match = next((trace for trace in traces if marker in trace.payload), None)
     assert match is not None
     assert secret not in match.payload
