@@ -4,10 +4,6 @@ from contextpilot.main import app
 from contextpilot.storage.repositories import list_traces
 
 
-def _auth_headers():
-    return {"Authorization": "Bearer local-dev-key"}
-
-
 def test_auth_is_enforced_on_v1_routes():
     response = TestClient(app).get("/v1/models")
     assert response.status_code == 401
@@ -15,10 +11,10 @@ def test_auth_is_enforced_on_v1_routes():
     assert payload["error"]["type"] == "unauthorized_error"
 
 
-def test_validation_errors_are_standardized():
+def test_validation_errors_are_standardized(auth_headers):
     response = TestClient(app).post(
         "/v1/chat/completions",
-        headers=_auth_headers(),
+        headers=auth_headers,
         json={"model": "contextpilot-auto", "messages": "invalid"},
     )
     assert response.status_code == 422
@@ -26,12 +22,12 @@ def test_validation_errors_are_standardized():
     assert payload["error"]["type"] == "invalid_request_error"
 
 
-def test_trace_payload_redaction():
+def test_trace_payload_redaction(auth_headers):
     marker = "safe-visible-marker"
     secret = "super-secret-value"
     response = TestClient(app).post(
         "/v1/chat/completions",
-        headers=_auth_headers(),
+        headers=auth_headers,
         json={
             "model": "contextpilot-auto",
             "messages": [{"role": "user", "content": "hi"}],
