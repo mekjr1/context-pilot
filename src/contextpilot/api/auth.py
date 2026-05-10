@@ -22,8 +22,10 @@ def require_api_key(
     authorization: str | None = Header(default=None),
     x_api_key_header: str | None = Header(default=None, alias="x-api-key"),
 ) -> None:
-    if not settings.api_key:
+    if settings.allow_unauthenticated_api:
         return
+    if not settings.api_key:
+        raise HTTPException(status_code=500, detail="API authentication is misconfigured")
     token = _extract_api_key(
         authorization=authorization, x_api_key_header=x_api_key_header
     )

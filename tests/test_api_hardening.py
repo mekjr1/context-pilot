@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from contextpilot.main import app
 from contextpilot.storage.repositories import list_traces
 
+# Large enough to include the new test trace in a shared local test DB.
 TRACE_SCAN_LIMIT = 200
 
 
