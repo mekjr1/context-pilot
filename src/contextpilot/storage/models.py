@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -11,7 +11,9 @@ class Trace(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     route: Mapped[str] = mapped_column(String(64))
     payload: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
 
 class RouteDecision(Base):
@@ -19,7 +21,9 @@ class RouteDecision(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     task_type: Mapped[str] = mapped_column(String(64))
     model_tier: Mapped[str] = mapped_column(String(32))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
 
 class Memory(Base):
@@ -27,7 +31,9 @@ class Memory(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     key: Mapped[str] = mapped_column(String(128), index=True)
     value: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
 
 class FreshnessCheck(Base):
@@ -36,4 +42,6 @@ class FreshnessCheck(Base):
     source: Mapped[str] = mapped_column(String(512))
     check_type: Mapped[str] = mapped_column(String(32))
     metadata_json: Mapped[str] = mapped_column("metadata", Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )

@@ -7,7 +7,7 @@ from contextpilot.api.schemas import ChatCompletionRequest, ResponsesRequest
 from contextpilot.context.planner import plan
 from contextpilot.router.classifier import classify
 from contextpilot.router.model_router import select_model
-from contextpilot.storage.repositories import write_route, write_trace
+from contextpilot.storage.repositories import write_route, write_trace_payload
 
 router = APIRouter(prefix="/v1")
 
@@ -19,7 +19,7 @@ def chat(req: ChatCompletionRequest):
     classification = classify(messages, req.model)
     route = select_model(classification)
     write_route(classification.task_type, route["tier"])
-    write_trace(classification.task_type, json.dumps(payload))
+    write_trace_payload(classification.task_type, payload)
 
     provider = route["provider"]
     model = route["model"]

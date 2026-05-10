@@ -30,6 +30,11 @@ pip install -e .
 contextpilot serve --host 127.0.0.1 --port 8787
 ```
 
+## Authentication
+- `/v1/*` endpoints require API key auth.
+- Send either `x-api-key: local-dev-key` or `Authorization: Bearer local-dev-key` (configurable via `settings.api_key`).
+- `/health` remains unauthenticated for liveness checks.
+
 ## CLI
 ```bash
 contextpilot classify "Fix retry bug in webhook handler"
@@ -58,12 +63,10 @@ This project is a strong MVP scaffold, but it is **not full production-ready yet
 - Local-first CLI and repository indexing/search scaffolds.
 
 ### What still needs to be done for production
-1. Enforce API auth at request boundaries (current API key config is not enforced in middleware/dependencies).
-2. Add robust error handling and standardized error payloads across provider/database/network failures.
-3. Add secret redaction and safer payload logging (current traces can include raw request content).
-4. Add migration versioning and operational DB lifecycle controls.
-5. Add real provider integrations (OpenAI/Anthropic/LiteLLM), retries, timeouts, and failover.
-6. Add rate limits, stronger security controls, and deployment hardening.
+1. Add migration versioning and operational DB lifecycle controls.
+2. Add real provider integrations (OpenAI/Anthropic/LiteLLM), retries, timeouts, and failover.
+3. Add rate limits, stronger security controls, and deployment hardening.
+4. Expand resilience patterns for external network/provider/database failures.
 
 ### Environment note
 In this execution environment, installation and runtime tests were blocked by package index/network restrictions (dependency downloads fail), so use a normal Python environment for full install-and-run validation.

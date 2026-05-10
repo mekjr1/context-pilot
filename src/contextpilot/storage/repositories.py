@@ -1,5 +1,6 @@
 import json
 
+from contextpilot.gateway.normalizer import sanitize_for_trace
 from contextpilot.storage.db import SessionLocal
 from contextpilot.storage.migrations import init_db
 from contextpilot.storage.models import FreshnessCheck, Memory, RouteDecision, Trace
@@ -19,6 +20,11 @@ def write_trace(route: str, payload: str) -> None:
     with SessionLocal() as session:
         session.add(Trace(route=route, payload=payload))
         session.commit()
+
+
+def write_trace_payload(route: str, payload: dict) -> None:
+    sanitized = sanitize_for_trace(payload)
+    write_trace(route, json.dumps(sanitized))
 
 
 def write_route(task_type: str, model_tier: str) -> None:

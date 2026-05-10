@@ -1,15 +1,19 @@
 from fastapi.testclient import TestClient
 from contextpilot.main import app
+from contextpilot.storage.repositories import list_traces
+
+HEADERS = {"x-api-key": "local-dev-key"}
 
 
 def test_models():
-    assert TestClient(app).get("/v1/models").status_code == 200
+    assert TestClient(app).get("/v1/models", headers=HEADERS).status_code == 200
 
 
 def test_chat():
     response = TestClient(app).post(
         "/v1/chat/completions",
         json={"model": "contextpilot-auto", "messages": [{"role": "user", "content": "hi"}]},
+        headers=HEADERS,
     )
     assert response.status_code == 200
 
@@ -22,5 +26,22 @@ def test_stream():
             "messages": [{"role": "user", "content": "hi"}],
             "stream": True,
         },
+        headers=HEADERS,
     )
     assert response.status_code == 200
+
+
+def test_trace_payload_redacts_sensitive_fields():
+    client = TestClient(app)
+    response = client.post(
+        "/v1/chat/completions",
+        json={
+            "model": "contextpilot-auto",
+            "messages": [{"role": "user", "content": "hi"}],
+            "tools": [{"type": "function", "api_key": "super-secret"}],
+        },
+        headers=HEADERS,
+    )
+    assert response.status_code == 200
+    row = list_traces(limit=1)[0]
+    assert "***REDACTED***" in row.payload
