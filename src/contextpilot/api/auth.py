@@ -5,7 +5,7 @@ from fastapi import Header, HTTPException
 from contextpilot.config import settings
 
 
-def _extract_token(authorization: str | None, x_api_key: str | None) -> str | None:
+def _extract_api_key(authorization: str | None, x_api_key: str | None) -> str | None:
     if x_api_key:
         return x_api_key
     if not authorization:
@@ -22,7 +22,7 @@ def require_api_key(
 ) -> None:
     if not settings.api_key:
         return
-    token = _extract_token(authorization=authorization, x_api_key=x_api_key)
+    token = _extract_api_key(authorization=authorization, x_api_key=x_api_key)
     if not token or not hmac.compare_digest(token, settings.api_key):
         raise HTTPException(
             status_code=401,

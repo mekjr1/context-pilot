@@ -2,6 +2,11 @@ SENSITIVE_KEY_PARTS = ("api_key", "apikey", "token", "secret", "password", "auth
 
 
 def redact_payload(value):
+    """Recursively redact secret-bearing dictionary keys in payload-like data.
+
+    Any dictionary key that contains one of `SENSITIVE_KEY_PARTS` (case-insensitive)
+    is replaced with `[REDACTED]`. Lists and nested dicts are traversed recursively.
+    """
     if isinstance(value, dict):
         redacted = {}
         for key, item in value.items():
