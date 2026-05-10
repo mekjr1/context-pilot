@@ -40,7 +40,7 @@ def test_trace_payload_redaction():
                     "type": "function",
                     "function": {
                         "name": "probe",
-                        "arguments": {"note": marker, "api_key": secret},
+                        "parameters": {"note": marker, "api_key": secret},
                     },
                 }
             ],
