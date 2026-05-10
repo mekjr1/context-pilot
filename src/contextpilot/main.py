@@ -29,7 +29,7 @@ def _error_payload(message: str, error_type: str, code: int) -> dict:
 
 
 @app.exception_handler(RequestValidationError)
-async def handle_validation_error(_, exc: RequestValidationError):
+async def handle_validation_error(_request, exc: RequestValidationError):
     return JSONResponse(
         status_code=422,
         content=_error_payload(str(exc), "invalid_request_error", 422),
@@ -37,7 +37,7 @@ async def handle_validation_error(_, exc: RequestValidationError):
 
 
 @app.exception_handler(HTTPException)
-async def handle_http_error(_, exc: HTTPException):
+async def handle_http_error(_request, exc: HTTPException):
     detail = exc.detail if isinstance(exc.detail, str) else "Request failed"
     return JSONResponse(
         status_code=exc.status_code,
@@ -46,7 +46,7 @@ async def handle_http_error(_, exc: HTTPException):
 
 
 @app.exception_handler(Exception)
-async def handle_unexpected_error(_, __: Exception):
+async def handle_unexpected_error(_request, _exc: Exception):
     return JSONResponse(
         status_code=500,
         content=_error_payload("Internal server error", "internal_error", 500),

@@ -43,5 +43,7 @@ def test_trace_payload_redacts_sensitive_fields():
         headers=HEADERS,
     )
     assert response.status_code == 200
-    row = list_traces(limit=1)[0]
+    traces = list_traces(limit=1)
+    assert traces
+    row = traces[0]
     assert "***REDACTED***" in row.payload

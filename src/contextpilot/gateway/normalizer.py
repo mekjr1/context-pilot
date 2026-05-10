@@ -1,9 +1,12 @@
+from typing import Any
+
+
 SENSITIVE_KEYWORDS = {"api_key", "authorization", "token", "secret", "password"}
 REDACTED_VALUE = "***REDACTED***"
 
 
 def sanitize_for_trace(
-    payload,
+    payload: Any,
     *,
     max_depth: int = 6,
     max_items: int = 100,
