@@ -9,6 +9,17 @@ class ModelRoute(BaseModel):
 class Settings(BaseModel):
     db_url: str = Field(default="sqlite:///contextpilot.db")
     api_key: str = Field(default="local-dev-key")
+    allow_unauthenticated_api: bool = Field(default=False)
+    redaction_sensitive_key_parts: tuple[str, ...] = Field(
+        default=(
+            "api_key",
+            "apikey",
+            "token",
+            "secret",
+            "password",
+            "authorization",
+        )
+    )
     models: dict[str, ModelRoute] = Field(
         default_factory=lambda: {
             "cheap": ModelRoute(provider="echo", model="echo-small"),

@@ -1,10 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from contextpilot.api.schemas import AnthropicMessagesRequest
 from contextpilot.api.openai import chat
-from contextpilot.api.schemas import ChatCompletionRequest
+from contextpilot.api.auth import require_api_key
+from contextpilot.api.schemas import AnthropicMessagesRequest, ChatCompletionRequest
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix="/v1", dependencies=[Depends(require_api_key)])
 
 
 @router.post("/messages")

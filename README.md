@@ -30,6 +30,11 @@ pip install -e .
 contextpilot serve --host 127.0.0.1 --port 8787
 ```
 
+## Authentication
+- `/health` is open for local liveness checks.
+- `/v1/*` endpoints require `Authorization: Bearer local-dev-key` by default (or `x-api-key`).
+- Configure key via `contextpilot.config.settings.api_key` for deployment environments.
+
 ## CLI
 ```bash
 contextpilot classify "Fix retry bug in webhook handler"
@@ -56,14 +61,12 @@ This project is a strong MVP scaffold, but it is **not full production-ready yet
 - Deterministic classify -> route -> plan flow with trace persistence.
 - SQLite-backed traces, route decisions, memories, and freshness events.
 - Local-first CLI and repository indexing/search scaffolds.
+- API key enforcement on `/v1/*`, standardized error payloads, and trace payload redaction.
 
 ### What still needs to be done for production
-1. Enforce API auth at request boundaries (current API key config is not enforced in middleware/dependencies).
-2. Add robust error handling and standardized error payloads across provider/database/network failures.
-3. Add secret redaction and safer payload logging (current traces can include raw request content).
-4. Add migration versioning and operational DB lifecycle controls.
-5. Add real provider integrations (OpenAI/Anthropic/LiteLLM), retries, timeouts, and failover.
-6. Add rate limits, stronger security controls, and deployment hardening.
+1. Add migration versioning and operational DB lifecycle controls.
+2. Add real provider integrations (OpenAI/Anthropic/LiteLLM), retries, timeouts, and failover.
+3. Add rate limits, stronger security controls, and deployment hardening.
 
 ### Environment note
 In this execution environment, installation and runtime tests were blocked by package index/network restrictions (dependency downloads fail), so use a normal Python environment for full install-and-run validation.
