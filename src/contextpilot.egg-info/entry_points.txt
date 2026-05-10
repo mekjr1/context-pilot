@@ -1,2 +1,0 @@
-[console_scripts]
-contextpilot = contextpilot.cli.app:app

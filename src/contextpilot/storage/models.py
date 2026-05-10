@@ -35,5 +35,5 @@ class FreshnessCheck(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     source: Mapped[str] = mapped_column(String(512))
     check_type: Mapped[str] = mapped_column(String(32))
-    metadata: Mapped[str] = mapped_column(Text)
+    metadata_json: Mapped[str] = mapped_column("metadata", Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
